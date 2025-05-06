@@ -15,6 +15,7 @@ import Sgb from "./pages/Sgb";
 import Demat from "./pages/Demat";
 import MutualFund from "./pages/MutualFund";
 import NotFound from "./pages/NotFound";
+import { AuthCheck } from "./components/AuthCheck";
 
 const queryClient = new QueryClient();
 
@@ -26,15 +27,51 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/tax-details" element={<TaxDetails />} />
-          <Route path="/reit" element={<Reit />} />
-          <Route path="/nps" element={<Nps />} />
-          <Route path="/fdrd" element={<FdRd />} />
-          <Route path="/sgb" element={<Sgb />} />
-          <Route path="/demat" element={<Demat />} />
-          <Route path="/mutual-fund" element={<MutualFund />} />
+          <Route path="/dashboard" element={
+            <AuthCheck>
+              <Dashboard />
+            </AuthCheck>
+          } />
+          <Route path="/profile" element={
+            <AuthCheck>
+              <Profile />
+            </AuthCheck>
+          } />
+          <Route path="/tax-details" element={
+            <AuthCheck>
+              <TaxDetails />
+            </AuthCheck>
+          } />
+          <Route path="/reit" element={
+            <AuthCheck>
+              <Reit />
+            </AuthCheck>
+          } />
+          <Route path="/nps" element={
+            <AuthCheck>
+              <Nps />
+            </AuthCheck>
+          } />
+          <Route path="/fdrd" element={
+            <AuthCheck>
+              <FdRd />
+            </AuthCheck>
+          } />
+          <Route path="/sgb" element={
+            <AuthCheck>
+              <Sgb />
+            </AuthCheck>
+          } />
+          <Route path="/demat" element={
+            <AuthCheck>
+              <Demat />
+            </AuthCheck>
+          } />
+          <Route path="/mutual-fund" element={
+            <AuthCheck>
+              <MutualFund />
+            </AuthCheck>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

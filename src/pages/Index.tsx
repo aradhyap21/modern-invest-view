@@ -5,35 +5,60 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [pan, setPan] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate login - in a real app, you'd validate with a backend
-    setTimeout(() => {
-      if (username && password) {
+    try {
+      // Query the customer table to find a matching user
+      const { data, error } = await supabase
+        .from('customer')
+        .select('customer_id, name, pan')
+        .eq('name', name)
+        .eq('pan', pan)
+        .single();
+
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        // Store the customer ID in session storage for reference across the app
+        sessionStorage.setItem('customer_id', data.customer_id.toString());
+        sessionStorage.setItem('customer_name', data.name);
+        
         toast({
           title: "Login Successful",
-          description: "Welcome to your investment dashboard",
+          description: `Welcome back, ${data.name}`,
         });
+        
         navigate('/dashboard');
       } else {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "Please check your credentials and try again",
+          description: "Invalid name or PAN. Please check your credentials.",
         });
       }
+    } catch (error) {
+      console.error('Error during login:', error);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: "Invalid name or PAN. Please check your credentials.",
+      });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -52,25 +77,26 @@ const Index = () => {
         <div className="login-gradient backdrop-blur-md border border-white/10 rounded-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-banking-white">Username</Label>
+              <Label htmlFor="name" className="text-banking-white">Full Name</Label>
               <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-banking-darkGray/50 border-banking-purple/20 text-banking-white"
-                placeholder="Enter your username"
+                placeholder="Enter your full name"
+                required
               />
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-banking-white">Password</Label>
+              <Label htmlFor="pan" className="text-banking-white">PAN Number</Label>
               <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="pan"
+                value={pan}
+                onChange={(e) => setPan(e.target.value)}
                 className="bg-banking-darkGray/50 border-banking-purple/20 text-banking-white"
-                placeholder="••••••••"
+                placeholder="ABCDE1234F"
+                required
               />
             </div>
             
@@ -84,7 +110,7 @@ const Index = () => {
           </form>
           
           <div className="mt-6 text-center text-sm text-banking-silver">
-            <p>Demo credentials: any username and password will work</p>
+            <p>Please enter your registered name and PAN to login</p>
           </div>
         </div>
       </div>
