@@ -55,11 +55,14 @@ const ProfilePage = () => {
           return;
         }
         
+        // Convert string customerId to number for database comparison
+        const customerIdNumber = parseInt(customerId, 10);
+        
         // Fetch customer data
         const { data: customerData, error: customerError } = await supabase
           .from('customer')
           .select('*')
-          .eq('customer_id', customerId)
+          .eq('customer_id', customerIdNumber)
           .single();
           
         if (customerError) {

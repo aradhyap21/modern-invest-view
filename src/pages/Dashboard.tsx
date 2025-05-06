@@ -42,6 +42,9 @@ const Dashboard = () => {
           return;
         }
 
+        // Convert string customerId to number for database comparison
+        const customerIdNumber = parseInt(customerId, 10);
+        
         // Fetch REIT data
         const { data: reitData, error: reitError } = await supabase
           .from('reit')
@@ -55,7 +58,7 @@ const Dashboard = () => {
         const { data: npsData, error: npsError } = await supabase
           .from('nps')
           .select('*')
-          .eq('customer_id', customerId);
+          .eq('customer_id', customerIdNumber);
           
         if (npsError) {
           console.error("NPS error:", npsError);
