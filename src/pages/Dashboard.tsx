@@ -3,6 +3,7 @@ import React from 'react';
 import { Navbar } from '@/components/Navbar';
 import { InvestmentGrid } from '@/components/InvestmentGrid';
 import { InvestmentStats } from '@/components/InvestmentStats';
+import { InvestmentsByCustomer } from '@/components/InvestmentsByCustomer';
 import { useInvestmentData } from '@/hooks/useInvestmentData';
 
 const Dashboard = () => {
@@ -18,6 +19,9 @@ const Dashboard = () => {
         
         <InvestmentStats stats={investmentStats} loading={loading} />
         {!loading && <InvestmentGrid stats={investmentStats} />}
+        
+        {/* Add the new customer investments table component */}
+        <InvestmentsByCustomer />
       </div>
     </div>
   );
