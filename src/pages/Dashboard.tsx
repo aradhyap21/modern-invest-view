@@ -171,8 +171,14 @@ const Dashboard = () => {
   const calculateTotalStockValue = (stocksData) => {
     if (!stocksData || !stocksData.length) return 0;
     return stocksData.reduce((sum, stock) => {
-      const price = parseFloat(stock.current_price.replace(/[^\d.-]/g, '')) || 0;
-      return sum + price;
+      // Handle current_price as either number or string
+      let price = stock.current_price;
+      // If it's a string with non-numeric characters, try to parse it
+      if (typeof price === 'string') {
+        price = parseFloat(price.replace(/[^\d.-]/g, '')) || 0;
+      }
+      // If it's already a number, use it directly
+      return sum + (typeof price === 'number' ? price : 0);
     }, 0);
   };
 
