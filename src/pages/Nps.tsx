@@ -1,31 +1,77 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
 
 const NpsPage = () => {
-  // Sample NPS data
-  const npsData = [
-    {
-      id: "NPS-001",
-      customerId: "CUST-45782",
-      accountId: "NPSA-78452",
-      contribution: "₹2,000/month",
-      maturityAge: "60 years",
-      fundChoice: "Balanced"
-    },
-    {
-      id: "NPS-002",
-      customerId: "CUST-45782",
-      accountId: "NPSA-78453",
-      contribution: "₹5,000/month",
-      maturityAge: "60 years",
-      fundChoice: "Aggressive"
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [npsData, setNpsData] = useState([]);
+
+  useEffect(() => {
+    async function fetchNpsData() {
+      setLoading(true);
+      
+      try {
+        const customerId = sessionStorage.getItem('customer_id');
+        
+        if (!customerId) {
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Could not find customer information",
+          });
+          setLoading(false);
+          return;
+        }
+
+        // Convert string customerId to number for database comparison
+        const customerIdNumber = parseInt(customerId, 10);
+        
+        // Fetch NPS data for customer
+        const { data, error } = await supabase
+          .from('nps')
+          .select('*')
+          .eq('customer_id', customerIdNumber);
+          
+        if (error) {
+          console.error("NPS fetch error:", error);
+          toast({
+            variant: "destructive",
+            title: "Data Loading Error",
+            description: "Failed to load NPS data",
+          });
+        } else if (data) {
+          setNpsData(data);
+        }
+      } catch (error) {
+        console.error("Error fetching NPS data:", error);
+        toast({
+          variant: "destructive",
+          title: "Data Loading Error",
+          description: "Failed to load NPS data from database",
+        });
+      } finally {
+        setLoading(false);
+      }
     }
-  ];
+    
+    fetchNpsData();
+  }, [toast]);
+
+  // Format currency helper
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(value);
+  };
 
   return (
     <div className="min-h-screen bg-banking-darkBg pb-20">
@@ -42,43 +88,55 @@ const NpsPage = () => {
           <h1 className="text-3xl font-bold text-banking-white">National Pension System</h1>
         </div>
         
-        <div className="grid gap-6">
-          {npsData.map((nps) => (
-            <Card key={nps.id} className="bg-banking-darkGray border-banking-purple/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-banking-white text-xl">NPS {nps.id}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-                  <div>
-                    <div className="text-sm text-banking-silver">NPS ID</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.id}</div>
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <div className="animate-pulse text-banking-white">Loading NPS data...</div>
+          </div>
+        ) : npsData.length === 0 ? (
+          <Card className="bg-banking-darkGray border-banking-purple/20">
+            <CardContent className="pt-6">
+              <p className="text-banking-white text-center">No NPS accounts found.</p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6">
+            {npsData.map((nps) => (
+              <Card key={nps.nps_id} className="bg-banking-darkGray border-banking-purple/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-banking-white text-xl">NPS {nps.nps_id}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <div className="text-sm text-banking-silver">NPS ID</div>
+                      <div className="text-lg font-medium text-banking-white">{nps.nps_id}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-banking-silver">Customer ID</div>
+                      <div className="text-lg font-medium text-banking-white">{nps.customer_id}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-banking-silver">Account ID</div>
+                      <div className="text-lg font-medium text-banking-white">{nps.account_id}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-banking-silver">Contribution</div>
+                      <div className="text-lg font-medium text-banking-white">{formatCurrency(nps.contribution)}/month</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-banking-silver">Maturity Age</div>
+                      <div className="text-lg font-medium text-banking-white">{nps.maturity_age} years</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-banking-silver">Fund Choice</div>
+                      <div className="text-lg font-medium text-banking-white">{nps.fund_choice}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-sm text-banking-silver">Customer ID</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.customerId}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-banking-silver">Account ID</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.accountId}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-banking-silver">Contribution</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.contribution}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-banking-silver">Maturity Age</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.maturityAge}</div>
-                  </div>
-                  <div>
-                    <div className="text-sm text-banking-silver">Fund Choice</div>
-                    <div className="text-lg font-medium text-banking-white">{nps.fundChoice}</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
