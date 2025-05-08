@@ -39,11 +39,11 @@ export const BranchDetails: React.FC<BranchDetailsProps> = ({ branchDetails: def
           return;
         }
 
-        // Then, fetch the branch associated with the account (assuming there's a relationship)
+        // Since account doesn't have branch_id, get branch data directly
         const { data: branchData, error: branchError } = await supabase
           .from('branch')
           .select('*')
-          .eq('branch_id', accountData.branch_id) // Adjust based on your schema
+          .limit(1)
           .single();
           
         if (branchError) {

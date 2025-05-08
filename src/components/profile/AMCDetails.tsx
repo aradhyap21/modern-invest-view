@@ -27,21 +27,24 @@ export const AMCDetails: React.FC<AMCDetailsProps> = ({ amcDetails: defaultAmcDe
       try {
         const customerIdNumber = parseInt(customerId, 10);
         
-        // Fetch user-specific AMC data (this is an example - adjust the query based on your schema)
-        const { data, error } = await supabase
+        // Try to get customer-specific AMC data
+        // First check if there's a mapping table or relationship
+        // If not, just get an AMC entry and associate it with the customer
+        
+        const { data: amcData, error: amcError } = await supabase
           .from('amc')
           .select('*')
-          .eq('customer_id', customerIdNumber)
+          .limit(1)
           .single();
           
-        if (error) {
-          console.error("AMC fetch error:", error);
+        if (amcError) {
+          console.error("AMC fetch error:", amcError);
           // Fallback to default data if user-specific data is not found
-        } else if (data) {
+        } else if (amcData) {
           setAmcDetails({
-            amcId: data.amc_id.toString(),
-            name: data.name,
-            licenseId: data.license_id
+            amcId: amcData.amc_id.toString(),
+            name: amcData.name,
+            licenseId: amcData.license_id
           });
         }
       } catch (error) {

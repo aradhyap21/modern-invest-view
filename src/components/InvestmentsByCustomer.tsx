@@ -104,8 +104,9 @@ export const InvestmentsByCustomer = () => {
           // For demonstration, distribute SGB data among customers
           sgbData.forEach((sgb, index) => {
             const customerIndex = index % investmentsByCustomer.length;
-            const sgbValue = (sgb.quantity || 0) * (sgb.purchase_price || 0);
-            investmentsByCustomer[customerIndex].sgb = `₹${formatCurrency(sgbValue)}`;
+            // Fixed: The sgb object doesn't have a quantity property
+            // Instead, use purchase_price as the value 
+            investmentsByCustomer[customerIndex].sgb = `₹${formatCurrency(sgb.purchase_price || 0)}`;
           });
         }
         

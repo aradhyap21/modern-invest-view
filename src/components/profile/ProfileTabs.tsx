@@ -23,7 +23,7 @@ interface ProfileTabsProps {
     regulations: string;
   };
   loading: boolean;
-  customerId?: string; // Add customerId prop
+  customerId?: string;
 }
 
 export const ProfileTabs: React.FC<ProfileTabsProps> = ({
@@ -31,7 +31,7 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({
   amcDetails,
   regulatoryDetails,
   loading,
-  customerId // Include customerId
+  customerId
 }) => {
   return (
     <Tabs defaultValue="branch" className="mb-6">

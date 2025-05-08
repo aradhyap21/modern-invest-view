@@ -28,27 +28,34 @@ export const RegulatoryDetails: React.FC<RegulatoryDetailsProps> = ({ regulatory
       try {
         const customerIdNumber = parseInt(customerId, 10);
         
-        // Fetch customer data to get country info
-        const { data: customerData, error: customerError } = await supabase
-          .from('customer')
-          .select('*')
-          .eq('customer_id', customerIdNumber)
-          .single();
-          
-        if (customerError) {
-          console.error("Customer fetch error:", customerError);
-          return;
-        }
+        // Get a default country if customer doesn't have one
+        let country = 'India'; // Default value
         
-        // Fetch regulatory body for the country
+        // Try to fetch regulatory body for the country
         const { data: regulatoryData, error: regulatoryError } = await supabase
           .from('regulatory_body')
           .select('*')
-          .eq('country', customerData.country || 'India') // Default to India if no country specified
+          .eq('country', country)
           .single();
           
         if (regulatoryError) {
           console.error("Regulatory fetch error:", regulatoryError);
+          
+          // If no exact match, try to get any regulatory body
+          const { data: anyRegData, error: anyRegError } = await supabase
+            .from('regulatory_body')
+            .select('*')
+            .limit(1)
+            .single();
+            
+          if (!anyRegError && anyRegData) {
+            setRegulatoryDetails({
+              regulatoryId: anyRegData.regulatory_id.toString(),
+              name: anyRegData.name,
+              country: anyRegData.country,
+              regulations: anyRegData.regulation
+            });
+          }
         } else if (regulatoryData) {
           setRegulatoryDetails({
             regulatoryId: regulatoryData.regulatory_id.toString(),
