@@ -110,6 +110,246 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_fd: {
+        Row: {
+          customer_fd_id: number
+          customer_id: number
+          fd_id: number
+          investment_amount: number
+          start_date: string
+        }
+        Insert: {
+          customer_fd_id: number
+          customer_id: number
+          fd_id: number
+          investment_amount: number
+          start_date: string
+        }
+        Update: {
+          customer_fd_id?: number
+          customer_id?: number
+          fd_id?: number
+          investment_amount?: number
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_fd_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_fd_fd_id_fkey"
+            columns: ["fd_id"]
+            isOneToOne: false
+            referencedRelation: "fd"
+            referencedColumns: ["fd_id"]
+          },
+        ]
+      }
+      customer_mutual_funds: {
+        Row: {
+          customer_fund_id: number
+          customer_id: number
+          fund_id: number
+          investment_amount: number
+          purchase_date: string
+        }
+        Insert: {
+          customer_fund_id: number
+          customer_id: number
+          fund_id: number
+          investment_amount: number
+          purchase_date: string
+        }
+        Update: {
+          customer_fund_id?: number
+          customer_id?: number
+          fund_id?: number
+          investment_amount?: number
+          purchase_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_mutual_funds_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_mutual_funds_fund_id_fkey"
+            columns: ["fund_id"]
+            isOneToOne: false
+            referencedRelation: "mutual_funds"
+            referencedColumns: ["fund_id"]
+          },
+        ]
+      }
+      customer_rd: {
+        Row: {
+          customer_id: number
+          customer_rd_id: number
+          rd_id: number
+          start_date: string
+          total_investment: number
+        }
+        Insert: {
+          customer_id: number
+          customer_rd_id: number
+          rd_id: number
+          start_date: string
+          total_investment: number
+        }
+        Update: {
+          customer_id?: number
+          customer_rd_id?: number
+          rd_id?: number
+          start_date?: string
+          total_investment?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_rd_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_rd_rd_id_fkey"
+            columns: ["rd_id"]
+            isOneToOne: false
+            referencedRelation: "rd"
+            referencedColumns: ["rd_id"]
+          },
+        ]
+      }
+      customer_reit: {
+        Row: {
+          customer_id: number
+          customer_reit_id: number
+          investment_amount: number
+          purchase_date: string
+          reit_id: number
+        }
+        Insert: {
+          customer_id: number
+          customer_reit_id: number
+          investment_amount: number
+          purchase_date: string
+          reit_id: number
+        }
+        Update: {
+          customer_id?: number
+          customer_reit_id?: number
+          investment_amount?: number
+          purchase_date?: string
+          reit_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_reit_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_reit_reit_id_fkey"
+            columns: ["reit_id"]
+            isOneToOne: false
+            referencedRelation: "reit"
+            referencedColumns: ["reit_id"]
+          },
+        ]
+      }
+      customer_sgb: {
+        Row: {
+          customer_id: number
+          customer_sgb_id: number
+          investment_amount: number
+          purchase_date: string
+          quantity: number
+          sgb_id: number
+        }
+        Insert: {
+          customer_id: number
+          customer_sgb_id: number
+          investment_amount: number
+          purchase_date: string
+          quantity: number
+          sgb_id: number
+        }
+        Update: {
+          customer_id?: number
+          customer_sgb_id?: number
+          investment_amount?: number
+          purchase_date?: string
+          quantity?: number
+          sgb_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_sgb_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_sgb_sgb_id_fkey"
+            columns: ["sgb_id"]
+            isOneToOne: false
+            referencedRelation: "sgb"
+            referencedColumns: ["sgb_id"]
+          },
+        ]
+      }
+      customer_stocks: {
+        Row: {
+          customer_id: number
+          customer_stock_id: number
+          purchase_date: string
+          purchase_price: number
+          quantity: number
+          stock_id: number
+        }
+        Insert: {
+          customer_id: number
+          customer_stock_id: number
+          purchase_date: string
+          purchase_price: number
+          quantity: number
+          stock_id: number
+        }
+        Update: {
+          customer_id?: number
+          customer_stock_id?: number
+          purchase_date?: string
+          purchase_price?: number
+          quantity?: number
+          stock_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_stocks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_stocks_stock_id_fkey"
+            columns: ["stock_id"]
+            isOneToOne: false
+            referencedRelation: "stocks"
+            referencedColumns: ["stock_id"]
+          },
+        ]
+      }
       deposit: {
         Row: {
           deposit_id: number
@@ -144,35 +384,24 @@ export type Database = {
       }
       fd: {
         Row: {
-          deposit_id: number
           fd_id: number
           maturity_date: string
           maturity_deposit: number
           rate: number
         }
         Insert: {
-          deposit_id: number
           fd_id: number
           maturity_date: string
           maturity_deposit: number
           rate: number
         }
         Update: {
-          deposit_id?: number
           fd_id?: number
           maturity_date?: string
           maturity_deposit?: number
           rate?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "fd_deposit_id_fkey"
-            columns: ["deposit_id"]
-            isOneToOne: false
-            referencedRelation: "deposit"
-            referencedColumns: ["deposit_id"]
-          },
-        ]
+        Relationships: []
       }
       investment: {
         Row: {
@@ -271,35 +500,24 @@ export type Database = {
       }
       rd: {
         Row: {
-          deposit_id: number
           maturity_date: string
           monthly_deposit: number
           rate: number
           rd_id: number
         }
         Insert: {
-          deposit_id: number
           maturity_date: string
           monthly_deposit: number
           rate: number
           rd_id: number
         }
         Update: {
-          deposit_id?: number
           maturity_date?: string
           monthly_deposit?: number
           rate?: number
           rd_id?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "rd_deposit_id_fkey"
-            columns: ["deposit_id"]
-            isOneToOne: false
-            referencedRelation: "deposit"
-            referencedColumns: ["deposit_id"]
-          },
-        ]
+        Relationships: []
       }
       regulatory_body: {
         Row: {
@@ -351,21 +569,18 @@ export type Database = {
           deadline: string
           issuer: string
           purchase_price: number
-          quantity: number
           sgb_id: number
         }
         Insert: {
           deadline: string
           issuer: string
           purchase_price: number
-          quantity: number
           sgb_id: number
         }
         Update: {
           deadline?: string
           issuer?: string
           purchase_price?: number
-          quantity?: number
           sgb_id?: number
         }
         Relationships: []

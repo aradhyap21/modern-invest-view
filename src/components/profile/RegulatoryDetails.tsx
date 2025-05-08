@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
 
 interface RegulatoryDetailsProps {
   regulatoryDetails: {
@@ -10,9 +12,66 @@ interface RegulatoryDetailsProps {
     regulations: string;
   };
   loading: boolean;
+  customerId?: string;
 }
 
-export const RegulatoryDetails: React.FC<RegulatoryDetailsProps> = ({ regulatoryDetails, loading }) => {
+export const RegulatoryDetails: React.FC<RegulatoryDetailsProps> = ({ regulatoryDetails: defaultRegulatoryDetails, loading: initialLoading, customerId }) => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(initialLoading);
+  const [regulatoryDetails, setRegulatoryDetails] = useState(defaultRegulatoryDetails);
+
+  useEffect(() => {
+    async function fetchRegulatoryData() {
+      if (!customerId) return;
+      
+      setLoading(true);
+      try {
+        const customerIdNumber = parseInt(customerId, 10);
+        
+        // Fetch customer data to get country info
+        const { data: customerData, error: customerError } = await supabase
+          .from('customer')
+          .select('*')
+          .eq('customer_id', customerIdNumber)
+          .single();
+          
+        if (customerError) {
+          console.error("Customer fetch error:", customerError);
+          return;
+        }
+        
+        // Fetch regulatory body for the country
+        const { data: regulatoryData, error: regulatoryError } = await supabase
+          .from('regulatory_body')
+          .select('*')
+          .eq('country', customerData.country || 'India') // Default to India if no country specified
+          .single();
+          
+        if (regulatoryError) {
+          console.error("Regulatory fetch error:", regulatoryError);
+        } else if (regulatoryData) {
+          setRegulatoryDetails({
+            regulatoryId: regulatoryData.regulatory_id.toString(),
+            name: regulatoryData.name,
+            country: regulatoryData.country,
+            regulations: regulatoryData.regulation
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching regulatory data:", error);
+        toast({
+          variant: "destructive",
+          title: "Data Loading Error",
+          description: "Failed to load regulatory data from database",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchRegulatoryData();
+  }, [customerId, toast]);
+
   if (loading) {
     return (
       <Card className="bg-banking-darkGray border-banking-purple/20">

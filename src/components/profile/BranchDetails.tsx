@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
 
 interface BranchDetailsProps {
   branchDetails: {
@@ -9,9 +11,65 @@ interface BranchDetailsProps {
     ifscCode: string;
   };
   loading: boolean;
+  customerId?: string;
 }
 
-export const BranchDetails: React.FC<BranchDetailsProps> = ({ branchDetails, loading }) => {
+export const BranchDetails: React.FC<BranchDetailsProps> = ({ branchDetails: defaultBranchDetails, loading: initialLoading, customerId }) => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(initialLoading);
+  const [branchDetails, setBranchDetails] = useState(defaultBranchDetails);
+
+  useEffect(() => {
+    async function fetchBranchData() {
+      if (!customerId) return;
+      
+      setLoading(true);
+      try {
+        const customerIdNumber = parseInt(customerId, 10);
+        
+        // First, get the account associated with the customer
+        const { data: accountData, error: accountError } = await supabase
+          .from('account')
+          .select('*')
+          .eq('customer_id', customerIdNumber)
+          .single();
+          
+        if (accountError) {
+          console.error("Account fetch error:", accountError);
+          return;
+        }
+
+        // Then, fetch the branch associated with the account (assuming there's a relationship)
+        const { data: branchData, error: branchError } = await supabase
+          .from('branch')
+          .select('*')
+          .eq('branch_id', accountData.branch_id) // Adjust based on your schema
+          .single();
+          
+        if (branchError) {
+          console.error("Branch fetch error:", branchError);
+        } else if (branchData) {
+          setBranchDetails({
+            branchId: branchData.branch_id.toString(),
+            name: branchData.name,
+            ifscCode: branchData.ifsc_code
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching branch data:", error);
+        toast({
+          variant: "destructive",
+          title: "Data Loading Error",
+          description: "Failed to load branch data from database",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchBranchData();
+  }, [customerId, toast]);
+
   if (loading) {
     return (
       <Card className="bg-banking-darkGray border-banking-purple/20">

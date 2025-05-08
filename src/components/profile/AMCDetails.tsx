@@ -1,6 +1,8 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/components/ui/use-toast';
 
 interface AMCDetailsProps {
   amcDetails: {
@@ -9,9 +11,54 @@ interface AMCDetailsProps {
     licenseId: string;
   };
   loading: boolean;
+  customerId?: string;
 }
 
-export const AMCDetails: React.FC<AMCDetailsProps> = ({ amcDetails, loading }) => {
+export const AMCDetails: React.FC<AMCDetailsProps> = ({ amcDetails: defaultAmcDetails, loading: initialLoading, customerId }) => {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(initialLoading);
+  const [amcDetails, setAmcDetails] = useState(defaultAmcDetails);
+
+  useEffect(() => {
+    async function fetchAmcData() {
+      if (!customerId) return;
+      
+      setLoading(true);
+      try {
+        const customerIdNumber = parseInt(customerId, 10);
+        
+        // Fetch user-specific AMC data (this is an example - adjust the query based on your schema)
+        const { data, error } = await supabase
+          .from('amc')
+          .select('*')
+          .eq('customer_id', customerIdNumber)
+          .single();
+          
+        if (error) {
+          console.error("AMC fetch error:", error);
+          // Fallback to default data if user-specific data is not found
+        } else if (data) {
+          setAmcDetails({
+            amcId: data.amc_id.toString(),
+            name: data.name,
+            licenseId: data.license_id
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching AMC data:", error);
+        toast({
+          variant: "destructive",
+          title: "Data Loading Error",
+          description: "Failed to load AMC data from database",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchAmcData();
+  }, [customerId, toast]);
+
   if (loading) {
     return (
       <Card className="bg-banking-darkGray border-banking-purple/20">

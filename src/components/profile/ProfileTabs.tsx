@@ -23,13 +23,15 @@ interface ProfileTabsProps {
     regulations: string;
   };
   loading: boolean;
+  customerId?: string; // Add customerId prop
 }
 
 export const ProfileTabs: React.FC<ProfileTabsProps> = ({
   branchDetails,
   amcDetails,
   regulatoryDetails,
-  loading
+  loading,
+  customerId // Include customerId
 }) => {
   return (
     <Tabs defaultValue="branch" className="mb-6">
@@ -40,15 +42,15 @@ export const ProfileTabs: React.FC<ProfileTabsProps> = ({
       </TabsList>
       
       <TabsContent value="branch" className="mt-6">
-        <BranchDetails branchDetails={branchDetails} loading={loading} />
+        <BranchDetails branchDetails={branchDetails} loading={loading} customerId={customerId} />
       </TabsContent>
       
       <TabsContent value="amc" className="mt-6">
-        <AMCDetails amcDetails={amcDetails} loading={loading} />
+        <AMCDetails amcDetails={amcDetails} loading={loading} customerId={customerId} />
       </TabsContent>
       
       <TabsContent value="regulatory" className="mt-6">
-        <RegulatoryDetails regulatoryDetails={regulatoryDetails} loading={loading} />
+        <RegulatoryDetails regulatoryDetails={regulatoryDetails} loading={loading} customerId={customerId} />
       </TabsContent>
     </Tabs>
   );
