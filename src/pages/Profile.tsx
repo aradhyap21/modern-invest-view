@@ -33,7 +33,7 @@ const ProfilePage = () => {
   
   const [customerData, setCustomerData] = useState({
     name: "",
-    email: "john.doe@example.com", // Default value if not in database
+    accountId: "",
     phone: ""
   });
 
@@ -69,10 +69,21 @@ const ProfilePage = () => {
           throw customerError;
         }
         
+        // Fetch account data for this customer to get the account ID
+        const { data: accountData, error: accountError } = await supabase
+          .from('account')
+          .select('account_id')
+          .eq('customer_id', customerIdNumber)
+          .maybeSingle();
+          
+        if (accountError && accountError.code !== 'PGRST116') {
+          console.error("Account fetch error:", accountError);
+        }
+        
         if (customerData) {
           setCustomerData({
             name: customerData.name,
-            email: "john.doe@example.com", // This isn't in the database, keeping default
+            accountId: accountData ? accountData.account_id.toString() : 'No account found',
             phone: customerData.mobile_number ? customerData.mobile_number.toString() : ''
           });
         }
@@ -183,7 +194,7 @@ const ProfilePage = () => {
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-banking-white">{customerData.name}</h2>
-                      <p className="text-banking-silver">{customerData.email}</p>
+                      <p className="text-banking-silver">Account ID: {customerData.accountId}</p>
                       <p className="text-banking-silver">+{customerData.phone}</p>
                     </div>
                   </div>
